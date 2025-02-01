@@ -1,13 +1,13 @@
 package com.noobprogrammer.splito.service;
 
-import com.noobprogrammer.splito.dto.LoginRequest;
-import com.noobprogrammer.splito.model.User;
-
-import java.util.Optional;
+import com.noobprogrammer.splito.dto.AuthenticationRequest;
+import com.noobprogrammer.splito.dto.AuthenticationResponse;
+import com.noobprogrammer.splito.dto.RegistrationRequest;
 
 public interface UserService {
 
-    User registerUser(LoginRequest user);
+    AuthenticationResponse registerUser(RegistrationRequest request);
 
-    Optional<User> findByEmail(String email);
+    AuthenticationResponse loginUser(AuthenticationRequest request);
+
 }
