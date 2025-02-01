@@ -1,6 +1,8 @@
 package com.noobprogrammer.splito.service;
 
-import com.noobprogrammer.splito.dto.LoginRequest;
+import com.noobprogrammer.splito.dto.AuthenticationRequest;
+import com.noobprogrammer.splito.dto.AuthenticationResponse;
+import com.noobprogrammer.splito.dto.RegistrationRequest;
 import com.noobprogrammer.splito.model.User;
 import com.noobprogrammer.splito.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,8 +24,8 @@ public class UserServiceImpl implements UserService {
     }
 
 
-@Override
-    public User registerUser(LoginRequest request) {
+    @Override
+    public AuthenticationResponse registerUser(RegistrationRequest request) {
         if (userRepository.findByEmail(request.email()).isPresent()) {
             throw new IllegalArgumentException("Email already in use");
         }
@@ -36,11 +38,22 @@ public class UserServiceImpl implements UserService {
         user.setUsername(request.username());
         user.setEmail(request.email());
         user.setPassword(passwordEncoder.encode(request.password()));
-        return userRepository.save(user);
+        userRepository.save(user);
+        return new AuthenticationResponse("User registered successfully");
     }
 
     @Override
-    public Optional<User> findByEmail(String email) {
-        return userRepository.findByEmail(email);
+    public AuthenticationResponse loginUser(AuthenticationRequest request) {
+        Optional<User> userOptional = userRepository.findByUsername(request.username());
+        if (userOptional.isEmpty()) {
+            throw new IllegalArgumentException("User not found");
+        }
+        User user = userOptional.get();
+        if (!passwordEncoder.matches(request.password(), user.getPassword())) {
+            throw new IllegalArgumentException("Invalid password");
+        }
+
+        return new AuthenticationResponse("Logged in successfully");
     }
+
 }
