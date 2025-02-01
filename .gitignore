@@ -34,4 +34,4 @@ build/
 
 
 ### Enviorment ###
-src/main/resources/.env
+../chatterbox/src/main/resources/.env
