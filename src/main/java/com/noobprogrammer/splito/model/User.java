@@ -4,6 +4,8 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.LocalDateTime;
+import java.util.HashSet;
+import java.util.Set;
 
 @Entity
 @Getter
@@ -11,7 +13,7 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-@Table(name = "tbl_user")
+@Table(name = "tbl_users")
 public class User {
 
     @Id
@@ -30,6 +32,12 @@ public class User {
     private String lastName;
     @Column(unique = true, nullable = false)
     private String email;
+
+    @ManyToMany(mappedBy = "members")
+    private Set<Group> groups = new HashSet<>();
+
+    @OneToMany(mappedBy = "paidBy")
+    private Set<Expense> expenses = new HashSet<>();
 
     @Column
     private LocalDateTime createddt;

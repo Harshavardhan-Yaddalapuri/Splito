@@ -3,7 +3,6 @@ package com.noobprogrammer.splito.controller;
 import com.noobprogrammer.splito.dto.AuthenticationRequest;
 import com.noobprogrammer.splito.dto.AuthenticationResponse;
 import com.noobprogrammer.splito.dto.RegistrationRequest;
-import com.noobprogrammer.splito.model.User;
 import com.noobprogrammer.splito.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
