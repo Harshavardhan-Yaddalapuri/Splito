@@ -54,4 +54,9 @@ public class User {
     protected void onUpdate() {
         updateddt = LocalDateTime.now();
     }
+
+    public Object toUserDetails() {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'toUserDetails'");
+    }
 }

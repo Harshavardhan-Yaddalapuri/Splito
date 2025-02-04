@@ -28,8 +28,9 @@ public class Group {
     @OneToMany(mappedBy = "group")
     private Set<Expense> expenses = new HashSet<>();
 
-    @Column
-    private String group_owner; //TODO: think about proper name for this field
+    @ManyToOne
+    @JoinColumn(name = "admin_id")
+    private User admin;
 
     @Column
     private LocalDateTime createddt;

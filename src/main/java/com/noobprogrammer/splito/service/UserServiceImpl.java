@@ -8,19 +8,21 @@ import com.noobprogrammer.splito.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-
-import java.util.Optional;
+import org.springframework.security.core.userdetails.UserDetails;
+import com.noobprogrammer.splito.util.JwtUtil;
 
 @Service
 public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
+    private final JwtUtil jwtUtil;
 
     @Autowired
-    public UserServiceImpl(UserRepository userRepository, PasswordEncoder passwordEncoder) {
+    public UserServiceImpl(UserRepository userRepository, PasswordEncoder passwordEncoder, JwtUtil jwtUtil) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
+        this.jwtUtil = jwtUtil;
     }
 
 
@@ -44,16 +46,17 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public AuthenticationResponse loginUser(AuthenticationRequest request) {
-        Optional<User> userOptional = userRepository.findByUsername(request.username());
-        if (userOptional.isEmpty()) {
-            throw new IllegalArgumentException("User not found");
-        }
-        User user = userOptional.get();
-        if (!passwordEncoder.matches(request.password(), user.getPassword())) {
+        User user = userRepository.findByUsername(request.username())
+            .orElseThrow(() -> new IllegalArgumentException("User not found"));
+        
+        UserDetails userDetails = (UserDetails) user;
+        
+        if (!passwordEncoder.matches(request.password(), userDetails.getPassword())) {
             throw new IllegalArgumentException("Invalid password");
         }
-
-        return new AuthenticationResponse("Logged in successfully");
+        
+        String token = jwtUtil.generateToken(userDetails);
+        return new AuthenticationResponse(token);
     }
 
 }
