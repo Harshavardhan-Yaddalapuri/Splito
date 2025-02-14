@@ -2,6 +2,10 @@ package com.noobprogrammer.splito.security;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.AuthenticationProvider;
+import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
+import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
@@ -13,27 +17,23 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 import com.noobprogrammer.splito.repository.UserRepository;
 import com.noobprogrammer.splito.util.JwtUtil;
 
-import org.springframework.security.config.annotation.web.configurers.SessionManagementConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 
-import static org.springframework.security.config.Customizer.withDefaults;
-
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 
 @Configuration
 @EnableWebSecurity
+@RequiredArgsConstructor
 public class SecurityConfig {
 
+    private final UserRepository userRepository;
+    private final JwtUtil jwtUtil;
 
-    private UserRepository userRepository;
-    private JwtUtil jwtUtil;
-
-    @Autowired
-    public SecurityConfig(UserRepository userRepository, JwtUtil jwtUtil) {
-        this.userRepository = userRepository;
-        this.jwtUtil = jwtUtil;
+    @Bean
+    public JwtAuthenticationFilter jwtAuthenticationFilter() {
+        return new JwtAuthenticationFilter(jwtUtil, userDetailsService());
     }
 
     @Bean
@@ -46,21 +46,34 @@ public class SecurityConfig {
                         .requestMatchers("/api/v1/auth/**").permitAll()
                         .anyRequest().authenticated()
                 )
-                .addFilterBefore(new JwtAuthenticationFilter(jwtUtil, userDetailsService()), 
+                .authenticationProvider(authenticationProvider())
+                .addFilterBefore(jwtAuthenticationFilter(), 
                                 UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
     }
 
     @Bean
-    public PasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder();
+    public UserDetailsService userDetailsService() {
+        return username -> userRepository.findByUsername(username)
+                .orElseThrow(() -> new UsernameNotFoundException("User not found"));
     }
 
     @Bean
-    public UserDetailsService userDetailsService() {
-        return username -> userRepository.findByUsername(username)
-                .map(user -> user.toUserDetails())
-                .orElseThrow(() -> new UsernameNotFoundException("User not found"));
+    public AuthenticationProvider authenticationProvider() {
+        DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider();
+        authProvider.setUserDetailsService(userDetailsService());
+        authProvider.setPasswordEncoder(passwordEncoder());
+        return authProvider;
+    }
+
+    @Bean
+    public AuthenticationManager authenticationManager(AuthenticationConfiguration config) throws Exception {
+        return config.getAuthenticationManager();
+    }
+
+    @Bean
+    public PasswordEncoder passwordEncoder() {
+        return new BCryptPasswordEncoder();
     }
 }

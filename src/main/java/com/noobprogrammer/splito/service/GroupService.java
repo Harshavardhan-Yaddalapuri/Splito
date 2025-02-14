@@ -1,21 +1,34 @@
 package com.noobprogrammer.splito.service;
 
+import com.noobprogrammer.splito.dto.CreateGroupRequest;
 import com.noobprogrammer.splito.dto.GroupDTO;
-import com.noobprogrammer.splito.model.User;
 
 import java.util.List;
-import java.util.Set;
 
 public interface GroupService {
 
-    List<GroupDTO> viewAllGroups(String username);
+    /**
+     * Get all groups for a user
+     */
+    List<GroupDTO> getUserGroups(String username);
 
-    void createGroup(String groupName, String username);
+    /**
+     * Create a new group
+     */
+    GroupDTO createGroup(String username, CreateGroupRequest request);
 
-    void addUserToGroup(String groupName, String username, Set<User> members);
+    /**
+     * Add members to a group
+     */
+    GroupDTO addMembers(String username, Long groupId, List<String> memberUsernames);
 
-    void removeUserFromGroup(String groupName, String userToBeRemoved);
+    /**
+     * Remove members from a group
+     */
+    void removeMembers(String username, Long groupId, List<String> memberUsernames);
 
-    void deleteGroup(String groupName);
-
+    /**
+     * Delete a group
+     */
+    void deleteGroup(String username, Long groupId);
 }

@@ -9,4 +9,5 @@ import java.util.Optional;
 public interface GroupRepository extends JpaRepository<Group, Long> {
     Optional<Group> findByName(String name);
     List<Group> findByMembersUsername(String username);
+    Optional<Group> findByNameAndAdmin_Username(String name, String username);
 }

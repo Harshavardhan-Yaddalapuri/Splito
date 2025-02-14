@@ -1,10 +1,19 @@
 package com.noobprogrammer.splito.dto;
 
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
-import java.util.Set;
+import java.util.List;
 
-public record GroupDTO(
-    String name, 
-    String adminUsername,
-    Set<String> members
-) {}
+@Data
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
+public class GroupDTO {
+    private Long id;
+    private String name;
+    private String adminUsername;
+    private List<String> members;
+}

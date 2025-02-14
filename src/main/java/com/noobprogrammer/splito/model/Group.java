@@ -1,50 +1,67 @@
 package com.noobprogrammer.splito.model;
 
 import jakarta.persistence.*;
-import lombok.Data;
+import lombok.*;
 
 import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.Set;
 
-@Data
 @Entity
-@Table(name = "tbl_groups")
+@Getter
+@Setter
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
+@Table(name = "groups")
 public class Group {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(nullable = false)
     private String name;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "admin_id", nullable = false)
+    private User admin;
 
     @ManyToMany
     @JoinTable(
-            name = "tbl_group_members",
-            joinColumns = @JoinColumn(name = "group_id"),
-            inverseJoinColumns = @JoinColumn(name = "user_id")
+        name = "group_members",
+        joinColumns = @JoinColumn(name = "group_id"),
+        inverseJoinColumns = @JoinColumn(name = "user_id")
     )
     private Set<User> members = new HashSet<>();
 
-    @OneToMany(mappedBy = "group")
+    @OneToMany(mappedBy = "group", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<Expense> expenses = new HashSet<>();
 
-    @ManyToOne
-    @JoinColumn(name = "admin_id")
-    private User admin;
+    @Column(name = "created_at")
+    private LocalDateTime createdAt;
 
-    @Column
-    private LocalDateTime createddt;
-
-    @Column
-    private LocalDateTime updateddt;
+    @Column(name = "updated_at")
+    private LocalDateTime updatedAt;
 
     @PrePersist
     protected void onCreate() {
-        createddt = LocalDateTime.now();
+        createdAt = LocalDateTime.now();
+        updatedAt = LocalDateTime.now();
     }
 
     @PreUpdate
     protected void onUpdate() {
-        updateddt = LocalDateTime.now();
+        updatedAt = LocalDateTime.now();
+    }
+
+    public void addMember(User user) {
+        members.add(user);
+        user.getGroups().add(this);
+    }
+
+    public void removeMember(User user) {
+        members.remove(user);
+        user.getGroups().remove(this);
     }
 }

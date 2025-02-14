@@ -1,7 +1,14 @@
 package com.noobprogrammer.splito.dto;
 
-public record AuthenticationResponse(String token) {
-    public AuthenticationResponse(String token) {
-        this.token = token;
-    }
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+@Data
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
+public class AuthenticationResponse {
+    private String token;
 }
