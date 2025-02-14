@@ -1,9 +1,19 @@
 package com.noobprogrammer.splito.dto;
 
-import com.noobprogrammer.splito.model.Expense;
-import com.noobprogrammer.splito.model.User;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
-import java.util.Set;
+import java.util.List;
 
-public record GroupDTO(Long id, String name, Set<User> members, Set<Expense> expenses) {
+@Data
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
+public class GroupDTO {
+    private Long id;
+    private String name;
+    private String adminUsername;
+    private List<String> members;
 }
